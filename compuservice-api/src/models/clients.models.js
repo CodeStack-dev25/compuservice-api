@@ -49,4 +49,4 @@ const clientsSchema = new Schema({
         versionKey: false
     });
 
-export default model('client', clientsSchema);
+export default model('Client', clientsSchema);

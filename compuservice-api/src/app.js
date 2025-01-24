@@ -1,4 +1,5 @@
 import express from 'express';
+import session from 'express-session';
 import cors from 'cors';
 import MongoSingleton from './config/mongoDB.config.js';
 import { addLogger, appLogger } from './config/loggers.config.js';
@@ -15,9 +16,22 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(__dirname + '/public'));
 
+app.use(
+    session({
+      secret: "compuservice*2025-crbws", 
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        secure: false,
+        maxAge: 24 * 1000 * 60 * 60,
+      },
+    })
+  );
+
 app.use(addLogger);
 
-app.use(indexRouter)
+app.use(indexRouter);
 
 async function connectMongo() {
     appLogger.info('Connecting to MongoDB...');
@@ -29,7 +43,8 @@ async function connectMongo() {
     }
 }
 
-let port = 8080;
+let port = process.env.PORT || 8080;
+
 
 app.listen(port, () => {
     appLogger.info(`Server running on port ${port}`);
