@@ -20,7 +20,7 @@ export default class MongoSingleton {
     #connectMongoDB = async () => {
         try {
             await connect(
-               'mongodb+srv://compuservice2025:Ys1l6dgfZk1SJErp@cluster0.p8lpo.mongodb.net/CompuService',
+               process.env.DBURL,
             )
             appLogger.info('Connected to MongoDB');
         } catch (err) {

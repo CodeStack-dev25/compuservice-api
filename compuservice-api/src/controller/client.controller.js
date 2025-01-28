@@ -55,7 +55,8 @@ export const getClients = async (req, res) => {
 
 export const getClient = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
+        
         const client = await getClientById(id);
         if (!client) {
             appLogger.warn(`Client not found`);
@@ -180,7 +181,7 @@ export const getAllBrands = async (req, res) => {
     try {
         const brandList = await getBrands();
 
-        appLogger.info(`Brands retrieved successfully. Count: ${brandList.length}`);
+        appLogger.info(`Brands retrieved successfully.`);
         return res.status(200).json({
             message: "Brands retrieved successfully",
             data: brandList,

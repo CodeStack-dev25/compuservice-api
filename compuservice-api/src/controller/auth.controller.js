@@ -10,7 +10,7 @@ export const login = (req, res) =>{
             const { username, password } = req.body;
                       
             // Validar credenciales
-            if (username === "compuservice.2025@compuservice.com" && password === "210674Fdf_231096Cdf") {
+            if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
               req.session.isAuthenticated = true;
               
               return res.status(200).json({msj: 'Usuario conectado', user: 'CompuService'});

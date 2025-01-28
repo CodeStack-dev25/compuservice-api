@@ -5,8 +5,11 @@ import MongoSingleton from './config/mongoDB.config.js';
 import { addLogger, appLogger } from './config/loggers.config.js';
 import { __dirname } from './path.js';
 import indexRouter from './routes/index.routes.js';
+import dotenv from 'dotenv';
 
 const app = express();
+
+dotenv.config();
 
 app.use(cors());
 
@@ -18,7 +21,7 @@ app.use(express.static(__dirname + '/public'));
 
 app.use(
     session({
-      secret: "compuservice*2025-crbws", 
+      secret: process.env.SECRET, 
       resave: false,
       saveUninitialized: false,
       cookie: {
@@ -47,6 +50,8 @@ let port = process.env.PORT || 8080;
 
 
 app.listen(port, () => {
-    appLogger.info(`Server running on port ${port}`);
+    appLogger.info(`Server running on port ${port}`
+      
+    );
     connectMongo();
 });
