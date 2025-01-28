@@ -1,8 +1,7 @@
-import { getAllClients, newClient, getClientById, upClient, deleteLocalFiles, getBrands } from "../services/client.services.js";
+import { getAllClients, newClient, getClientById, upClient, deleteLocalFiles, getBrands, deleteClient } from "../services/client.services.js";
 import { appLogger } from '../config/loggers.config.js'
 import cloudinary from '../config/cloudinary.config.js';
 import clientsModels from "../models/clients.models.js";
-import brandModels from "../models/brand.models.js";
 
 export const createClients = async (req, res) => {
     try {
@@ -74,17 +73,7 @@ export const getClient = async (req, res) => {
 export const updateClient = async (req, res) => {
     try {
         const { id } = req.params
-
-        const clientUpdate = req.body;
-
-        const client = await getClientById(id);
-
-        if (!client) {
-            appLogger.warn(`Client not found`);
-            return res.status(404).json({ message: "Client not found" });
-        }
-
-        const updatedClient = await upClient(id, clientUpdate);
+        const updatedClient = await upClient(id, req.body);
         appLogger.info(`Client updated`);
         return res.status(200).json(updatedClient);
 
@@ -94,6 +83,55 @@ export const updateClient = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error });
     }
 }
+
+export const clientDelete = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Obtener el cliente por ID
+        const client = await getClientById(id);
+
+        if (!client) {
+            appLogger.warn(`Client not found`);
+            return res.status(404).json({ message: "Client not found" });
+        }
+
+        // Eliminar imágenes relacionadas en Cloudinary
+        const { hero, brand, thumbnail } = client;
+
+        // Eliminar imagen de 'hero' en Cloudinary
+        if (hero?.public_id) {
+            await cloudinary.uploader.destroy(hero.public_id);
+            appLogger.info(`Hero image deleted: ${hero.public_id}`);
+        }
+
+        // Eliminar imagen de 'brand' en Cloudinary
+        if (brand?.public_id) {
+            await cloudinary.uploader.destroy(brand.public_id);
+            appLogger.info(`Brand image deleted: ${brand.public_id}`);
+        }
+
+        // Eliminar imágenes de 'thumbnail' en Cloudinary
+        if (thumbnail?.length > 0) {
+            for (const thumb of thumbnail) {
+                if (thumb.public_id) {
+                    await cloudinary.uploader.destroy(thumb.public_id);
+                    appLogger.info(`Thumbnail image deleted: ${thumb.public_id}`);
+                }
+            }
+        }
+
+        // Eliminar el cliente de la base de datos
+        const deletedClient = await deleteClient(id);
+        appLogger.info(`Client deleted: ${id}`);
+
+        return res.status(200).json(deletedClient);
+    } catch (error) {
+        appLogger.error(error);
+        res.status(500).json({ message: "Internal Server Error", error });
+    }
+};
+
 
 export const imageUpdate = async (req, res) => {
     try {
@@ -107,15 +145,15 @@ export const imageUpdate = async (req, res) => {
         const result = await cloudinary.uploader.upload(file.path, {
             public_id,
             overwrite: true,
-            invalidate: true, 
+            invalidate: true,
         });
 
         const updatedDocument = await clientsModels.findOneAndUpdate(
-            { "thumbnail.public_id": public_id }, 
-            { 
-                $set: { "thumbnail.$.url": result.secure_url } 
+            { "thumbnail.public_id": public_id },
+            {
+                $set: { "thumbnail.$.url": result.secure_url }
             },
-            { new: true, useFindAndModify: false } 
+            { new: true, useFindAndModify: false }
         );
 
         if (!updatedDocument) {
@@ -141,7 +179,7 @@ export const imageUpdate = async (req, res) => {
 export const getAllBrands = async (req, res) => {
     try {
         const brandList = await getBrands();
-        
+
         appLogger.info(`Brands retrieved successfully. Count: ${brandList.length}`);
         return res.status(200).json({
             message: "Brands retrieved successfully",

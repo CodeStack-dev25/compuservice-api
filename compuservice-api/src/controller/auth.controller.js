@@ -8,7 +8,6 @@ const ADMIN_CREDENTIALS = {
 export const login = (req, res) =>{
     try {
             const { username, password } = req.body;
-                      console.log(req.body);
                       
             // Validar credenciales
             if (username === "compuservice.2025@compuservice.com" && password === "210674Fdf_231096Cdf") {
@@ -28,5 +27,6 @@ export const logout = (req, res) =>{
           return res.status(500).send("Ocurrió un error al cerrar la sesión");
         }
         res.status(200).send('Logout')
+        
       });
 }
