@@ -50,8 +50,7 @@ let port = process.env.PORT || 8080;
 
 
 app.listen(port, () => {
-    appLogger.info(`Server running on port ${port}`
-      
-    );
+    // appLogger.info(`Server running on port ${port}`
+      console.log(`Server running on port ${port}`);
     connectMongo();
 });
