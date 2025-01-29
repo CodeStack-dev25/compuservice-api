@@ -6,6 +6,7 @@ import { addLogger, appLogger } from './config/loggers.config.js';
 import { __dirname } from './path.js';
 import indexRouter from './routes/index.routes.js';
 import dotenv from 'dotenv';
+import connectMongo from 'connect-mongo';
 
 const app = express();
 
@@ -19,31 +20,43 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(__dirname + '/public'));
 
-app.use(
-    session({
-      secret: process.env.SECRET, 
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        httpOnly: true,
-        secure: false,
-        maxAge: 24 * 1000 * 60 * 60,
-      },
-    })
-  );
+const MongoStore = connectMongo(session);
+
+async function connectMongoDB() {
+  appLogger.info('Connecting to MongoDB...');
+  try {
+    const mongooseConnection = await MongoSingleton.getInstance(); // Esperamos que la conexión esté lista
+    app.use(
+      session({
+        secret: process.env.SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store: new MongoStore({
+          mongooseConnection,  // Usamos la conexión ya resuelta
+        }),
+        cookie: {
+          httpOnly: true,
+          secure: false,
+          maxAge: 24 * 1000 * 60 * 60, // 24 horas
+        },
+      })
+    );
+    appLogger.info('MongoDB connected successfully');
+  } catch (error) {
+    appLogger.error('MongoDB connection error: ', error);
+    process.exit(1);  // Detenemos la aplicación si no se conecta correctamente
+  }
+}
+
+// Llamar a la función para conectar a MongoDB
+connectMongoDB();
 
 app.use(addLogger);
 
 app.use(indexRouter);
 
-async function connectMongo() {
-    appLogger.info('Connecting to MongoDB...');
-    try {
-        await MongoSingleton.getInstance()
-    } catch (error) {
-        appLogger.error('MongoDB connection error: ', error);
-        process.exit(1);
-    }
-}
+const port = process.env.PORT || 4000;
 
-connectMongo();
+app.listen(port, () => {
+  appLogger.info(`Server running on port ${port}`);
+});
