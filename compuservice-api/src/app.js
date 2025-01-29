@@ -20,7 +20,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(__dirname + '/public'));
 
-const MongoStore = connectMongo(session);
+// Instanciar la clase MongoStore correctamente con 'new'
+const MongoStoreInstance = new MongoStore({
+  mongooseConnection: MongoSingleton.getInstance(),  
+});
 
 async function connectMongoDB() {
   appLogger.info('Connecting to MongoDB...');
@@ -31,9 +34,7 @@ async function connectMongoDB() {
         secret: process.env.SECRET,
         resave: false,
         saveUninitialized: false,
-        store: new MongoStore({
-          mongooseConnection,  // Usamos la conexión ya resuelta
-        }),
+        store: MongoStoreInstance,  // Usamos la instancia de MongoStore
         cookie: {
           httpOnly: true,
           secure: false,
