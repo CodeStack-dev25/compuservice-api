@@ -52,6 +52,9 @@ async function connectMongo() {
 
 let PORT = process.env.PORT || 3000;
 
+console.log(PORT);
+
+
 app.listen(PORT, () => {
     appLogger.http(`Servidor iniciado en PUERTO: ${PORT}`);
     connectMongo()
