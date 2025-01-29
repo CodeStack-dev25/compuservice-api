@@ -1,5 +1,5 @@
 import { appLogger } from '../config/loggers.config.js';
-import {queryMail} from '../utils/email.js'
+import { queryMail } from '../utils/email.js'
 import { transporter } from '../config/nodemailer.config.js';
 
 export const clientMail = async (user) => {

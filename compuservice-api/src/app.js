@@ -1,10 +1,10 @@
 import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
-import MongoSingleton from './src/config/mongoDB.config.js';
-import { addLogger, appLogger } from './src/config/loggers.config.js';
-import { __dirname } from './src/path.js';
-import indexRouter from './src/routes/index.routes.js';
+import MongoSingleton from './config/mongoDB.config.js';
+import { addLogger, appLogger } from './config/loggers.config.js';
+import { __dirname } from './path.js';
+import indexRouter from './routes/index.routes.js';
 import dotenv from 'dotenv';
 
 const app = express();
@@ -45,12 +45,4 @@ async function connectMongo() {
         process.exit(1);
     }
 }
-
-let port = process.env.PORT || 3000;
-
-
-app.listen(port, () => {
-    // appLogger.info(`Server running on port ${port}`
-      console.log(`Server running on port ${port}`);
-    connectMongo();
-});
+connectMongo();
