@@ -89,7 +89,6 @@ export const clientDelete = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Obtener el cliente por ID
         const client = await getClientById(id);
 
         if (!client) {
@@ -97,22 +96,18 @@ export const clientDelete = async (req, res) => {
             return res.status(404).json({ message: "Client not found" });
         }
 
-        // Eliminar imágenes relacionadas en Cloudinary
         const { hero, brand, thumbnail } = client;
 
-        // Eliminar imagen de 'hero' en Cloudinary
         if (hero?.public_id) {
             await cloudinary.uploader.destroy(hero.public_id);
             appLogger.info(`Hero image deleted: ${hero.public_id}`);
         }
 
-        // Eliminar imagen de 'brand' en Cloudinary
         if (brand?.public_id) {
             await cloudinary.uploader.destroy(brand.public_id);
             appLogger.info(`Brand image deleted: ${brand.public_id}`);
         }
 
-        // Eliminar imágenes de 'thumbnail' en Cloudinary
         if (thumbnail?.length > 0) {
             for (const thumb of thumbnail) {
                 if (thumb.public_id) {
@@ -122,7 +117,6 @@ export const clientDelete = async (req, res) => {
             }
         }
 
-        // Eliminar el cliente de la base de datos
         const deletedClient = await deleteClient(id);
         appLogger.info(`Client deleted: ${id}`);
 

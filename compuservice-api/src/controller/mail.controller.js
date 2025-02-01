@@ -5,13 +5,11 @@ export const sendMail = async (req, res) => {
     try {
         const { name, email, phone, query } = req.body;
         
-        // Validación básica de los datos
         if (!name || !email || !phone || !query) {
             appLogger.warn('Faltan datos en la solicitud');
             return res.status(400).json({ message: 'Todos los campos son obligatorios' });
         }
 
-        // Crear el objeto para enviar en el correo
         const user = {
             name,
             email,
@@ -19,7 +17,6 @@ export const sendMail = async (req, res) => {
             query,
         };
 
-        // Enviar el correo
         const newMail = await clientMail(user);
 
         appLogger.info('Correo enviado con éxito');

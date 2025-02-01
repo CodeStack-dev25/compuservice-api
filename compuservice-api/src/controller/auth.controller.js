@@ -1,10 +1,5 @@
 import { appLogger } from "../config/loggers.config.js"
 
-const ADMIN_CREDENTIALS = {
-    username: "compuservice.2025@compuservice.com",
-    password: "210674Fdf_231096Cdf"
-  };
-
 export const login = (req, res) =>{
     try {
             const { username, password } = req.body;
