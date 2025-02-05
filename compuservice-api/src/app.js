@@ -41,11 +41,11 @@ app.use(addLogger);
 app.use(indexRouter);
 
 async function connectMongo() {
-  appLogger.info('Connecting to MongoDB...');
+  appLogger.info('Conectando a MongoDB...');
   try {
     await MongoSingleton.getInstance()
   } catch (error) {
-    appLogger.error('MongoDB connection error: ', error);
+    appLogger.error('Error en la conexion con MongoDB: ', error);
     process.exit(1);
   }
 }
